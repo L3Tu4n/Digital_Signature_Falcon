@@ -106,7 +106,7 @@ const AdminHome = () => {
       CP_username: localStorage.getItem("cccd"),
     };
 
-    showLoading("Đang băm Hash SHA-256 và ký số Falcon..."); // <--- Bật Loading
+    showLoading("Đang băm Hash và ký số...");
     try {
       const response = await fetch(`${apiUrl}/sign`, {
         method: "POST",

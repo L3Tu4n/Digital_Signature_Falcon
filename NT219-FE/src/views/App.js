@@ -1,13 +1,16 @@
-import React, { Fragment, useEffect, Suspense } from "react";
-import { routes } from "../routes";
+import React, { Fragment, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   useLocation,
 } from "react-router-dom";
+import { routes } from "../routes";
+import LoadingUI, {
+  LoadingProvider,
+  useLoading,
+} from "../components/LoadingPage";
 import DefaultComponentHeader from "../components/DefaultComponent/DefaultComponentHeader";
-import { LoadingProvider, useLoading } from "../components/LoadingPage";
 
 const LocationWatcher = () => {
   const location = useLocation();
@@ -15,11 +18,7 @@ const LocationWatcher = () => {
 
   useEffect(() => {
     showLoading("Đang chuyển trang...");
-
-    const timer = setTimeout(() => {
-      hideLoading();
-    }, 500);
-
+    const timer = setTimeout(() => hideLoading(), 400);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -29,6 +28,8 @@ const LocationWatcher = () => {
 function App() {
   return (
     <LoadingProvider>
+      {" "}
+      {/* Dùng Provider từ file LoadingPage */}
       <Router>
         <LocationWatcher />
         <Routes>
