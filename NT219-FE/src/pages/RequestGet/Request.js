@@ -175,11 +175,10 @@ const Request = () => {
           Xin giấy
         </Button>
 
-        {/* Nút mới để điều hướng sang trang Verify Upload */}
         <Button
           type="default"
           icon={<SafetyCertificateOutlined />}
-          onClick={() => navigate("/verify")}
+          onClick={() => navigate("/verify-upload")}
           style={{ height: "40px", fontWeight: "bold" }}
         >
           Kiểm tra tài liệu

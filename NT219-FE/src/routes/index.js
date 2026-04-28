@@ -3,8 +3,9 @@ import SignIn from "../pages/Register/SignIn.jsx";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import Home from "../pages/Home/Home.jsx";
 import Admin from "../pages/Admin/Admin.jsx";
-import Request from "../pages/RequestGet/Request.jsx"
+import Request from "../pages/RequestGet/Request.jsx";
 import Verify from "../pages/Verify/Verify.jsx";
+import VerifyUpload from "../pages/Verify/VerifyUpload";
 
 export const routes = [
   {
@@ -30,6 +31,11 @@ export const routes = [
   {
     path: "*",
     page: NotFoundPage,
+  },
+  {
+    path: "/verify-upload",
+    page: VerifyUpload,
+    isShowHeader: true,
   },
   {
     path: "/verify/:gdc_id",
