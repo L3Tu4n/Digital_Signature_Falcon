@@ -9,13 +9,14 @@ from database_collections import create_user, create_chingsphu
 import os
 import random
 import string
-import hashlib
+import hashlib # <--- Thư viện sống còn để chống PTS
 from datetime import datetime
 from auth import create_access_token, decode_access_token, verify_password, validate_cccd
 from QR_and_Text import generate_qr_code, insert_qr_to_pdf, create_watermark, add_watermark
 
 app = FastAPI()
 
+# Đảm bảo thư mục lưu trữ luôn tồn tại
 if not os.path.exists("signed_pdf"):
     os.makedirs("signed_pdf")
 
@@ -32,6 +33,7 @@ app.add_middleware(
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# --- HÀM TÍNH MÃ BĂM (BẢO VỆ TOÀN VẸN FILE) ---
 def calculate_pdf_hash(file_path: str) -> str:
     """Tính mã băm SHA-256 của file để đảm bảo tính toàn vẹn (Integrity)"""
     sha256_hash = hashlib.sha256()
@@ -44,11 +46,9 @@ def calculate_pdf_hash(file_path: str) -> str:
 async def signup(user: User):
     if not validate_cccd(user.cccd):
         raise HTTPException(status_code=400, detail="CCCD phải đủ 12 chữ số và hợp lệ")
-
     existing_user = await user_collection.find_one(user.cccd)
     if existing_user:
         raise HTTPException(status_code=400, detail="CCCD đã được đăng ký trước đó")
-
     return await create_user(user)
 
 @app.post("/token")
@@ -70,7 +70,6 @@ async def read_users_me(token: str = Depends(oauth2_scheme)):
     payload = decode_access_token(token)
     if payload is None:
         raise HTTPException(status_code=401, detail="Could not validate credentials")
-    
     return {"name": payload["username"], "user_type": payload["type"], "cccd": payload.get("cccd")}
 
 @app.post("/chingsphu/")
@@ -101,45 +100,52 @@ async def sign(sign_data: SignModel, token: str = Depends(oauth2_scheme)):
         if not gdc: raise HTTPException(status_code=404, detail="GDC not found")
 
         user = await user_collection.find_one({"cccd": gdc["cccd"]})
+        if not user: raise HTTPException(status_code=404, detail="User not found")
+        
         chingsphu = await chingsphu_collection.find_one({"_id": sign_data.CP_username})
+        if not chingsphu: raise HTTPException(status_code=404, detail="Chingsphu not found")
 
         user_info = {"cccd": user["cccd"]}
         chingsphu_info = {"CP_username": chingsphu["CP_username"], "sign_place": chingsphu["sign_place"]}
         road_info = {"start_place": gdc["start_place"], "destination_place": gdc["destination_place"]}
 
         temp_path = "template/gdc.pdf"
+
+        # BƯỚC 1: Ký số Falcon
         falcon = FalconSignature()
         message, gdc_id, signature = await falcon.sign_pdf(temp_path, user_info, chingsphu_info, road_info, sign_data.gdc_Id)
         
-        if gdc_id is None: raise Exception("Failed to sign PDF", message)
+        if gdc_id is None: raise Exception("Failed to sign PDF and save signature to GDC", message)
 
-        # Tạo file PDF cuối cùng
-        qr_url = f"https://digital-signature-falcon.vercel.app/verify/{gdc_id}"
-        generate_qr_code(qr_url, "qr_code.png")
-        qr_pdf = f"signed_pdf/{gdc_id}_qr.pdf"
-        insert_qr_to_pdf(temp_path, "qr_code.png", qr_pdf)
+        # BƯỚC 2: Chèn QR và Watermark tạo file PDF cuối cùng
+        verification_url = f"https://digital-signature-falcon.vercel.app/verify/{gdc_id}"
+        generate_qr_code(verification_url, "qr_code.png")
+        qr_inserted_pdf_path = f"signed_pdf/{gdc_id}_qr.pdf"
+        insert_qr_to_pdf(temp_path, "qr_code.png", qr_inserted_pdf_path)
         
         create_watermark(user, gdc, "Sitka Banner.ttf", "watermark.pdf")
-        final_pdf = f"signed_pdf/{gdc_id}.pdf"
-        add_watermark(qr_pdf, "watermark.pdf", final_pdf)
+        final_pdf_path = f"signed_pdf/{gdc_id}.pdf"
+        add_watermark(qr_inserted_pdf_path, "watermark.pdf", final_pdf_path)
 
-        # --- SECURITY UPGRADE: LƯU MÃ HASH GỐC ---
-        original_hash = calculate_pdf_hash(final_pdf)
+        # BƯỚC 3: TÍNH VÀ LƯU MÃ HASH CỦA FILE CUỐI CÙNG
+        original_hash = calculate_pdf_hash(final_pdf_path)
 
         update_data = {
             "CP_username": chingsphu["CP_username"],
             "sign_place": chingsphu["sign_place"],
             "sign_date": datetime.now().isoformat(),
             "signature": signature,
-            "file_hash": original_hash # Lưu "vân tay" file vào DB
+            "file_hash": original_hash # Lưu "vân tay" vào DB để chống PTS
         }
-        await gdc_collection.update_one({"gdc_Id": gdc_id}, {"$set": update_data})
+        await gdc_collection.update_one({"gdc_Id": sign_data.gdc_Id}, {"$set": update_data})
 
         # Dọn dẹp file tạm
-        for f in ["qr_code.png", "watermark.pdf", qr_pdf]:
+        for f in ["qr_code.png", "watermark.pdf", qr_inserted_pdf_path]:
             if os.path.exists(f): os.remove(f)
 
-        return JSONResponse(status_code=200, content={"Status": "Success", "Message": message})
+        return JSONResponse(status_code=200, content={"Status": "Success", "Message": message, "Signed PDF Path": final_pdf_path})
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"Status": "Error", "Message": e.detail})
     except Exception as e:
         return JSONResponse(status_code=500, content={"Status": "Error", "Message": str(e)})
 
@@ -153,8 +159,10 @@ async def verify(gdc_id: str):
         if "signature" not in gdc:
             return JSONResponse(status_code=200, content={"Status": "Unsigned", "Message": "Giấy đi chợ chưa được xác thực!"})
 
-        # --- SECURITY UPGRADE: KIỂM TRA TÍNH TOÀN VẸN (ANTI-PTS) ---
+        # --- CHỐT CHẶN 1: KIỂM TRA TÍNH TOÀN VẸN FILE BẰNG HASHLIB ---
         current_pdf_path = f"signed_pdf/{gdc_id}.pdf"
+        
+        # Sửa lỗi: Phải đảm bảo file tồn tại trên server để test
         if os.path.exists(current_pdf_path):
             current_hash = calculate_pdf_hash(current_pdf_path)
             if current_hash != gdc.get("file_hash"):
@@ -162,21 +170,41 @@ async def verify(gdc_id: str):
                     "Status": "Tampered", 
                     "Message": "CẢNH BÁO: Tài liệu đã bị chỉnh sửa nội dung trái phép (PTS)!"
                 })
+        else:
+            # Nếu chạy thực tế không có file vật lý trên server, bạn nên làm API upload để test hash
+            pass
 
-        # Nếu Hash khớp, tiến hành verify Falcon như cũ
-        # Giả lập xác thực Falcon thành công
-        chingsphu = await chingsphu_collection.find_one({"CP_username": gdc["CP_username"]})
+        # --- CHỐT CHẶN 2: XÁC THỰC CHỮ KÝ FALCON ---
+        user = await user_collection.find_one({"_id": gdc["cccd"]})
+        chingsphu = await chingsphu_collection.find_one({"_id": gdc["CP_username"]})
+
+        user_info = {"cccd": user["cccd"]}
+        chingsphu_info = {"name": chingsphu["name"], "sign_place": chingsphu["sign_place"]}
+        road_info = {"start_place": gdc["start_place"], "destination_place": gdc["destination_place"]}
+
+        falcon = FalconSignature()
+        # Đã sửa lỗi đường dẫn tại đây: truyền đúng current_pdf_path
+        is_valid = await falcon.verify_pdf(gdc_id, current_pdf_path, user_info, chingsphu_info, road_info)
         
-        return JSONResponse(status_code=200, content={
-            "Status": "Success",
-            "Message": "Xác thực thành công! Nội dung nguyên bản.",
-            "cccd": gdc["cccd"],
-            "start_place": gdc["start_place"],
-            "destination_place": gdc["destination_place"],
-            "chingsphu_name": chingsphu["name"] if chingsphu else "UBND",
-            "sign_date": gdc["sign_date"],
-            "sign_place": gdc["sign_place"]
-        })
+        if is_valid:
+            # Nếu qua được cả Hash và Falcon, trả về Success
+            sign_date_format = datetime.now().strftime("%d/%m/%Y %H:%M") 
+            # (Lưu ý: Tốt nhất nên lấy sign_date từ gdc thay vì now() để hiện đúng giờ ký)
+            return JSONResponse(status_code=200, content={
+                "Status": "Success", 
+                "Message": "Xác thực thành công! Nội dung nguyên bản.",
+                "cccd": user_info["cccd"],
+                "start_place": road_info["start_place"],
+                "destination_place": road_info["destination_place"],
+                "chingsphu_name": chingsphu_info["name"],
+                "sign_date": gdc.get("sign_date", sign_date_format),
+                "sign_place": chingsphu_info["sign_place"]
+            })
+        else:
+            return JSONResponse(status_code=200, content={"Status": "Error", "Message": "Chữ ký Falcon không hợp lệ hoặc đã bị giả mạo!"})
+            
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"Status": "Error", "Message": e.detail})
     except Exception as e:
         return JSONResponse(status_code=500, content={"Status": "Error", "Message": str(e)})
     
