@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, Suspense } from "react";
 import { routes } from "../routes";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import DefaultComponentHeader from "../components/DefaultComponent/DefaultComponentHeader";
-import LoadingPage from "./components/LoadingPage";
+import LoadingPage from "../components/LoadingPage";
 
 function App() {
   useEffect(() => {
