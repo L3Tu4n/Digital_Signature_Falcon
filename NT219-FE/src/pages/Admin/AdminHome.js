@@ -14,7 +14,6 @@ import { SafetyCertificateOutlined, InboxOutlined } from "@ant-design/icons";
 import "../../styles/AdminHome.css";
 
 const { Dragger } = Upload;
-const { Text } = Typography;
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const columns = [
