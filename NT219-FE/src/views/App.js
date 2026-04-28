@@ -10,10 +10,11 @@ function App() {
   }, []);
 
   const fetchApi = async () => {
-    //const res = await fetch(`${process.env.REACT_API_URL_BACKEND}/user/getAll`);
-    //const data = await res.json();
-    //console.log("res", data);
+    // const res = await fetch(`${process.env.REACT_API_URL_BACKEND}/user/getAll`);
+    // const data = await res.json();
+    // console.log("res", data);
   };
+
   return (
     <div>
       <Router>
@@ -26,6 +27,7 @@ function App() {
               const HeaderLayout = route.isShowHeader
                 ? DefaultComponentHeader
                 : Fragment;
+
               return (
                 <Route
                   key={index}
