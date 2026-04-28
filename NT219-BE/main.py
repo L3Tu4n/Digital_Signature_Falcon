@@ -168,10 +168,9 @@ async def verify(gdc_id: str):
             if current_hash != gdc.get("file_hash"):
                 return JSONResponse(status_code=200, content={
                     "Status": "Tampered", 
-                    "Message": "CẢNH BÁO: Tài liệu đã bị chỉnh sửa nội dung trái phép (PTS)!"
+                    "Message": "CẢNH BÁO: Tài liệu đã bị chỉnh sửa nội dung trái phép!"
                 })
         else:
-            # Nếu chạy thực tế không có file vật lý trên server, bạn nên làm API upload để test hash
             pass
 
         # --- CHỐT CHẶN 2: XÁC THỰC CHỮ KÝ FALCON ---
