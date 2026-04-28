@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Result, Card, Descriptions, Spin, Alert, Tag } from "antd";
 import {
-  CheckCircleOutlined,
   WarningOutlined,
   CloseCircleOutlined,
   StopOutlined,
