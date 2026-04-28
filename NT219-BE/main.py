@@ -285,7 +285,7 @@ async def verify_uploaded_file(gdc_id: str, file: UploadFile = File(...)):
         if current_hash != gdc.get("file_hash"):
             return JSONResponse(status_code=200, content={
                 "Status": "Tampered", 
-                "Message": "CẢNH BÁO: Nội dung file đã bị can thiệp trái phép (PTS)!"
+                "Message": "CẢNH BÁO: Nội dung file đã bị can thiệp trái phép!"
             })
 
         # 5. Nếu Hash chuẩn, lấy thông tin trả về

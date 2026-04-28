@@ -1,7 +1,8 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, Suspense } from "react";
 import { routes } from "../routes";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import DefaultComponentHeader from "../components/DefaultComponent/DefaultComponentHeader";
+import LoadingPage from "./components/LoadingPage";
 
 function App() {
   useEffect(() => {
@@ -16,25 +17,29 @@ function App() {
   return (
     <div>
       <Router>
-        <Routes>
-          {routes.map((route, index) => {
-            const Page = route.page;
-            const HeaderLayout = route.isShowHeader
-              ? DefaultComponentHeader
-              : Fragment;
-            return (
-              <Route
-                key={index}
-                path={route.path}
-                element={
-                  <HeaderLayout>
-                    <Page />
-                  </HeaderLayout>
-                }
-              />
-            );
-          })}
-        </Routes>
+        <Suspense
+          fallback={<LoadingPage message="Hệ thống đang khởi tạo..." />}
+        >
+          <Routes>
+            {routes.map((route, index) => {
+              const Page = route.page;
+              const HeaderLayout = route.isShowHeader
+                ? DefaultComponentHeader
+                : Fragment;
+              return (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={
+                    <HeaderLayout>
+                      <Page />
+                    </HeaderLayout>
+                  }
+                />
+              );
+            })}
+          </Routes>
+        </Suspense>
       </Router>
     </div>
   );
