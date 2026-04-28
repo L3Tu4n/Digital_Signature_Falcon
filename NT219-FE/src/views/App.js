@@ -6,10 +6,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { routes } from "../routes";
-import LoadingUI, {
-  LoadingProvider,
-  useLoading,
-} from "../components/LoadingPage";
+import { LoadingProvider, useLoading } from "../components/LoadingPage";
 import DefaultComponentHeader from "../components/DefaultComponent/DefaultComponentHeader";
 
 const LocationWatcher = () => {
@@ -20,7 +17,7 @@ const LocationWatcher = () => {
     showLoading("Đang chuyển trang...");
     const timer = setTimeout(() => hideLoading(), 400);
     return () => clearTimeout(timer);
-  }, [location.pathname]);
+  }, [location.pathname, showLoading, hideLoading]);
 
   return null;
 };

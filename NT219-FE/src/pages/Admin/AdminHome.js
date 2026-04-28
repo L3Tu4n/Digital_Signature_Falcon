@@ -70,9 +70,9 @@ const AdminHome = () => {
 
   useEffect(() => {
     loadAllGdc();
-  }, []);
+  }, [loadAllGdc]);
 
-  const loadAllGdc = async () => {
+  const loadAllGdc = useCallback(async () => {
     showLoading("Đang tải danh sách giấy đi chợ...");
     try {
       const response = await fetch(`${apiUrl}/load_all_gdc`, {
@@ -98,7 +98,7 @@ const AdminHome = () => {
     } finally {
       hideLoading(); // <--- Tắt khi xong
     }
-  };
+  }, [showLoading, hideLoading]);
 
   const handleSign = async (record) => {
     const signData = {
