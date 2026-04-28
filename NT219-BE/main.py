@@ -260,3 +260,49 @@ async def load_all_gdc(token: str = Depends(oauth2_scheme)):
     if not gdc_list:
         raise HTTPException(status_code=404, detail="No GDC found")
     return JSONResponse(status_code=200, content=gdc_list)
+
+@app.post("/verify_upload/{gdc_id}")
+async def verify_uploaded_file(gdc_id: str, file: UploadFile = File(...)):
+    try:
+        gdc = await gdc_collection.find_one({"gdc_Id": gdc_id})
+        if not gdc:
+            return JSONResponse(status_code=404, content={"Status": "Invalid", "Message": "Mã tài liệu không tồn tại!"})
+
+        if "file_hash" not in gdc:
+            return JSONResponse(status_code=400, content={"Status": "Error", "Message": "Tài liệu này chưa được niêm phong Hash!"})
+
+        # 1. Lưu file upload tạm thời vào server để tính toán
+        temp_file_path = f"temp_verify_{gdc_id}.pdf"
+        with open(temp_file_path, "wb") as buffer:
+            buffer.write(await file.read())
+
+        # 2. Tính Hash của file vừa upload
+        current_hash = calculate_pdf_hash(temp_file_path)
+
+        # 3. Dọn dẹp xóa file tạm ngay lập tức (Chuẩn Security)
+        os.remove(temp_file_path)
+
+        # 4. Đối soát Hash
+        if current_hash != gdc.get("file_hash"):
+            return JSONResponse(status_code=200, content={
+                "Status": "Tampered", 
+                "Message": "CẢNH BÁO: Nội dung file đã bị can thiệp trái phép (PTS)!"
+            })
+
+        # 5. Nếu Hash chuẩn, lấy thông tin trả về
+        chingsphu = await chingsphu_collection.find_one({"CP_username": gdc["CP_username"]})
+        
+        return JSONResponse(status_code=200, content={
+            "Status": "Success",
+            "Message": "Xác thực thành công! Tài liệu toàn vẹn 100%.",
+            "cccd": gdc["cccd"],
+            "start_place": gdc["start_place"],
+            "destination_place": gdc["destination_place"],
+            "chingsphu_name": chingsphu["name"] if chingsphu else "UBND",
+            "sign_date": gdc.get("sign_date", "N/A")
+        })
+
+    except Exception as e:
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+        return JSONResponse(status_code=500, content={"Status": "Error", "Message": str(e)})

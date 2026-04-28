@@ -1,10 +1,10 @@
-import React from 'react';
-import CallVerify from './CallVerify';
+import React from "react";
+import VerifyTabs from "./VerifyTabs";
 
 const Verify = () => {
   return (
     <div>
-        <CallVerify />
+      <VerifyTabs />
     </div>
   );
 };

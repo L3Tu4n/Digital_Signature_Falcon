@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Tag, Typography, Modal, Input, message } from "antd";
-import { DownloadOutlined } from "@ant-design/icons";
-import { useLocation } from "react-router-dom";
+import { DownloadOutlined, SafetyCertificateOutlined } from "@ant-design/icons"; // Import thêm icon
+import { useLocation, useNavigate } from "react-router-dom"; // Import thêm useNavigate
 import "../../styles/Request.css";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -13,6 +13,7 @@ const Request = () => {
   const [to, setTo] = useState("");
 
   const location = useLocation();
+  const navigate = useNavigate(); // Khởi tạo hook điều hướng
 
   useEffect(() => {
     const loadGdc = async () => {
@@ -164,10 +165,26 @@ const Request = () => {
         }
         locale={{ emptyText: <Typography>Chưa có giấy đi chợ</Typography> }}
       />
-      <div className="request-button-container">
+
+      {/* Sửa lại vùng chứa nút bằng display: flex để 2 nút nằm ngang nhau */}
+      <div
+        className="request-button-container"
+        style={{ display: "flex", gap: "10px", marginTop: "15px" }}
+      >
         <Button type="primary" onClick={showModal} className="request-btn">
           Xin giấy
         </Button>
+
+        {/* Nút mới để điều hướng sang trang Verify Upload */}
+        <Button
+          type="default"
+          icon={<SafetyCertificateOutlined />}
+          onClick={() => navigate("/verify")}
+          style={{ height: "40px", fontWeight: "bold" }}
+        >
+          Kiểm tra tài liệu
+        </Button>
+
         <Modal
           title={
             <Typography variant="h4" component="h1" className="request-title">
