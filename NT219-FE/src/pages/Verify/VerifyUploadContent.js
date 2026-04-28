@@ -104,9 +104,7 @@ const VerifyUploadContent = () => {
           <Title level={3} style={{ color: "#1890ff", marginBottom: 0 }}>
             HỆ THỐNG KIỂM ĐỊNH TÀI LIỆU SỐ
           </Title>
-          <Text type="secondary">
-            Phát hiện chỉnh sửa trái phép bằng SHA-256
-          </Text>
+          <Text type="secondary">Phát hiện chỉnh sửa trái phép</Text>
         </div>
 
         {!result ? (
