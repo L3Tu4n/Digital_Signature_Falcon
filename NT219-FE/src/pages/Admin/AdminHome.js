@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { SafetyCertificateOutlined, InboxOutlined } from "@ant-design/icons";
 import "../../styles/AdminHome.css";
+import { useLoading } from "../../context/LoadingContext";
 
 const { Dragger } = Upload;
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -57,20 +58,22 @@ const columns = [
 ];
 
 const AdminHome = () => {
+  const { showLoading, hideLoading } = useLoading();
+
   const [data, setData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1); // Quản lý trang hiện tại
+  const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 7;
 
   const [isVerifyModalVisible, setIsVerifyModalVisible] = useState(false);
   const [verifyId, setVerifyId] = useState("");
   const [verifyFile, setVerifyFile] = useState(null);
-  const [verifyLoading, setVerifyLoading] = useState(false);
 
   useEffect(() => {
     loadAllGdc();
   }, []);
 
   const loadAllGdc = async () => {
+    showLoading("Đang tải danh sách giấy đi chợ...");
     try {
       const response = await fetch(`${apiUrl}/load_all_gdc`, {
         headers: {
@@ -92,6 +95,8 @@ const AdminHome = () => {
       setData(newData);
     } catch (error) {
       message.error("Lỗi tải dữ liệu!");
+    } finally {
+      hideLoading(); // <--- Tắt khi xong
     }
   };
 
@@ -100,6 +105,8 @@ const AdminHome = () => {
       gdc_Id: record.marketPassId,
       CP_username: localStorage.getItem("cccd"),
     };
+
+    showLoading("Đang băm Hash SHA-256 và ký số Falcon..."); // <--- Bật Loading
     try {
       const response = await fetch(`${apiUrl}/sign`, {
         method: "POST",
@@ -121,6 +128,8 @@ const AdminHome = () => {
       }
     } catch (error) {
       message.error("Lỗi hệ thống khi ký!");
+    } finally {
+      hideLoading(); // <--- Tắt Loading
     }
   };
 
@@ -129,7 +138,8 @@ const AdminHome = () => {
       message.error("Vui lòng nhập ID và chọn file PDF.");
       return;
     }
-    setVerifyLoading(true);
+
+    showLoading("Đang kiểm định tính toàn vẹn tài liệu..."); // <--- Dùng cái này thay cho state verifyLoading cũ
     const formData = new FormData();
     formData.append("file", verifyFile);
     try {
@@ -155,7 +165,7 @@ const AdminHome = () => {
     } catch (error) {
       message.error("Lỗi kết nối!");
     } finally {
-      setVerifyLoading(false);
+      hideLoading();
     }
   };
 
@@ -164,7 +174,6 @@ const AdminHome = () => {
     onClick: () => handleSign(item),
   }));
 
-  // Lấy dữ liệu cho trang hiện tại
   const currentTableData = dataWithActions.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
@@ -172,7 +181,6 @@ const AdminHome = () => {
 
   return (
     <div className="container" style={{ padding: "20px" }}>
-      {/* BẢNG DỮ LIỆU - Tắt pagination mặc định */}
       <Table
         columns={columns}
         dataSource={currentTableData}
@@ -182,7 +190,6 @@ const AdminHome = () => {
         }
       />
 
-      {/* THANH ĐIỀU KHIỂN DƯỚI CÙNG (NGANG HÀNG) */}
       <div
         style={{
           marginTop: "20px",
@@ -191,7 +198,6 @@ const AdminHome = () => {
           alignItems: "center",
         }}
       >
-        {/* Phân trang bên trái */}
         <Pagination
           current={currentPage}
           total={data.length}
@@ -200,7 +206,6 @@ const AdminHome = () => {
           showSizeChanger={false}
         />
 
-        {/* Nút Kiểm tra tài liệu bên phải */}
         <Button
           type="default"
           icon={<SafetyCertificateOutlined />}
@@ -210,7 +215,6 @@ const AdminHome = () => {
             fontWeight: "bold",
             border: "1px solid rgb(78, 147, 178)",
             color: "rgb(78, 147, 178)",
-            backgroundColor: "#fff",
             borderRadius: "6px",
           }}
         >
@@ -218,17 +222,15 @@ const AdminHome = () => {
         </Button>
       </div>
 
-      {/* MODAL GIỮ NGUYÊN NHƯ CŨ */}
       <Modal
         title={
-          <Typography variant="h4" className="request-title">
+          <Typography className="request-title">
             KIỂM ĐỊNH TÀI LIỆU SỐ
           </Typography>
         }
         open={isVerifyModalVisible}
         okText="Kiểm tra ngay"
         onOk={handleVerifyOk}
-        confirmLoading={verifyLoading}
         onCancel={() => setIsVerifyModalVisible(false)}
         okButtonProps={{ style: { backgroundColor: "rgb(78, 147, 178)" } }}
       >

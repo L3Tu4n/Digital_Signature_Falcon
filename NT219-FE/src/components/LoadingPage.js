@@ -1,36 +1,42 @@
-import React from "react";
-import { Spin, Typography } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+import React, { createContext, useState, useContext } from "react";
+import LoadingPage from "../components/LoadingPage";
 
-const { Text } = Typography;
+const LoadingContext = createContext();
 
-const LoadingPage = ({ message = "Đang tải dữ liệu..." }) => {
-  const antIcon = (
-    <LoadingOutlined
-      style={{ fontSize: 48, color: "rgb(78, 147, 178)" }}
-      spin
-    />
-  );
+export const LoadingProvider = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState("Đang tải...");
+
+  const showLoading = (msg) => {
+    setMessage(msg || "Đang tải dữ liệu...");
+    setIsLoading(true);
+  };
+
+  const hideLoading = () => setIsLoading(false);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "80vh",
-        width: "100%",
-      }}
-    >
-      <Spin indicator={antIcon} />
-      <Text
-        style={{ marginTop: 20, color: "rgb(78, 147, 178)", fontWeight: "500" }}
-      >
-        {message}
-      </Text>
-    </div>
+    <LoadingContext.Provider value={{ showLoading, hideLoading }}>
+      {isLoading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            zIndex: 9999,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <LoadingPage message={message} />
+        </div>
+      )}
+      {children}
+    </LoadingContext.Provider>
   );
 };
 
-export default LoadingPage;
+export const useLoading = () => useContext(LoadingContext);

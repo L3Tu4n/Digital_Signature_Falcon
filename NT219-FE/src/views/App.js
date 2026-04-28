@@ -1,49 +1,57 @@
 import React, { Fragment, useEffect, Suspense } from "react";
 import { routes } from "../routes";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import DefaultComponentHeader from "../components/DefaultComponent/DefaultComponentHeader";
-import LoadingPage from "../components/LoadingPage";
+import { LoadingProvider, useLoading } from "../context/LoadingContext";
+
+const LocationWatcher = () => {
+  const location = useLocation();
+  const { showLoading, hideLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading("Đang chuyển trang...");
+
+    const timer = setTimeout(() => {
+      hideLoading();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  return null;
+};
 
 function App() {
-  useEffect(() => {
-    fetchApi();
-  }, []);
-
-  const fetchApi = async () => {
-    // const res = await fetch(`${process.env.REACT_API_URL_BACKEND}/user/getAll`);
-    // const data = await res.json();
-    // console.log("res", data);
-  };
-
   return (
-    <div>
+    <LoadingProvider>
       <Router>
-        <Suspense
-          fallback={<LoadingPage message="Hệ thống đang khởi tạo..." />}
-        >
-          <Routes>
-            {routes.map((route, index) => {
-              const Page = route.page;
-              const HeaderLayout = route.isShowHeader
-                ? DefaultComponentHeader
-                : Fragment;
-
-              return (
-                <Route
-                  key={index}
-                  path={route.path}
-                  element={
-                    <HeaderLayout>
-                      <Page />
-                    </HeaderLayout>
-                  }
-                />
-              );
-            })}
-          </Routes>
-        </Suspense>
+        <LocationWatcher />
+        <Routes>
+          {routes.map((route, index) => {
+            const Page = route.page;
+            const HeaderLayout = route.isShowHeader
+              ? DefaultComponentHeader
+              : Fragment;
+            return (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  <HeaderLayout>
+                    <Page />
+                  </HeaderLayout>
+                }
+              />
+            );
+          })}
+        </Routes>
       </Router>
-    </div>
+    </LoadingProvider>
   );
 }
 
