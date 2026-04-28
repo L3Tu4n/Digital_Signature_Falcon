@@ -9,11 +9,7 @@ import {
   Upload,
   message,
 } from "antd";
-import {
-  SafetyCertificateOutlined,
-  InboxOutlined,
-  DownloadOutlined,
-} from "@ant-design/icons";
+import { SafetyCertificateOutlined, InboxOutlined } from "@ant-design/icons";
 import "../../styles/AdminHome.css";
 
 const { Dragger } = Upload;
