@@ -68,10 +68,6 @@ const AdminHome = () => {
   const [verifyId, setVerifyId] = useState("");
   const [verifyFile, setVerifyFile] = useState(null);
 
-  useEffect(() => {
-    loadAllGdc();
-  }, [loadAllGdc]);
-
   const loadAllGdc = useCallback(async () => {
     showLoading("Đang tải danh sách giấy đi chợ...");
     try {
@@ -99,6 +95,10 @@ const AdminHome = () => {
       hideLoading(); // <--- Tắt khi xong
     }
   }, [showLoading, hideLoading]);
+
+  useEffect(() => {
+    loadAllGdc();
+  }, [loadAllGdc]);
 
   const handleSign = async (record) => {
     const signData = {
