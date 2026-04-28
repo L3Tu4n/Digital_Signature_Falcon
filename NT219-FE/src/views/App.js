@@ -1,11 +1,6 @@
-import React, { Fragment, useEffect, Suspense } from "react";
+import React, { Fragment } from "react";
 import { routes } from "../routes";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import DefaultComponentHeader from "../components/DefaultComponent/DefaultComponentHeader";
 
 function App() {
