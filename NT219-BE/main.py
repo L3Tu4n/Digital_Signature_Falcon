@@ -15,9 +15,15 @@ from QR_and_Text import generate_qr_code, insert_qr_to_pdf, create_watermark, ad
 
 app = FastAPI()
 
+if not os.path.exists("signed_pdf"):
+    os.makedirs("signed_pdf")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://digital-signature-falcon.vercel.app", 
+        "http://localhost:3000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -125,7 +131,7 @@ async def sign(sign_data: SignModel, token: str = Depends(oauth2_scheme)):
                 
         await gdc_collection.update_one({"gdc_Id": sign_data.gdc_Id}, {"$set": update_data})
 
-        verification_url = f"http://localhost:3000/verify/{gdc_id}"
+        verification_url = f"https://digital-signature-falcon.vercel.app/verify/{gdc_id}"
         qr_code_path = "qr_code.png"
         generate_qr_code(verification_url, qr_code_path)
 
