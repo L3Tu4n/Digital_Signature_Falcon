@@ -7,7 +7,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import DefaultComponentHeader from "../components/DefaultComponent/DefaultComponentHeader";
-import { LoadingProvider, useLoading } from "../context/LoadingContext";
+import { LoadingProvider, useLoading } from "../components/LoadingPage";
 
 const LocationWatcher = () => {
   const location = useLocation();

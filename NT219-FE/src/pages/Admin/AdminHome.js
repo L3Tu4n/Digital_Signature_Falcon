@@ -12,7 +12,7 @@ import {
 } from "antd";
 import { SafetyCertificateOutlined, InboxOutlined } from "@ant-design/icons";
 import "../../styles/AdminHome.css";
-import { useLoading } from "../../context/LoadingContext";
+import { useLoading } from "../../components/LoadingPage";
 
 const { Dragger } = Upload;
 const apiUrl = process.env.REACT_APP_API_URL;
