@@ -8,6 +8,7 @@ import {
   Typography,
   Upload,
   message,
+  Pagination,
 } from "antd";
 import { SafetyCertificateOutlined, InboxOutlined } from "@ant-design/icons";
 import "../../styles/AdminHome.css";
@@ -58,8 +59,9 @@ const columns = [
 
 const AdminHome = () => {
   const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1); // Quản lý trang hiện tại
+  const pageSize = 7;
 
-  // --- STATE CHO TÍNH NĂNG KIỂM TRA DỮ LIỆU ---
   const [isVerifyModalVisible, setIsVerifyModalVisible] = useState(false);
   const [verifyId, setVerifyId] = useState("");
   const [verifyFile, setVerifyFile] = useState(null);
@@ -90,7 +92,7 @@ const AdminHome = () => {
       newData.sort((a, b) => (a.status === "Chưa ký" ? -1 : 1));
       setData(newData);
     } catch (error) {
-      message.error("Không thể tải danh sách dữ liệu!");
+      message.error("Lỗi tải dữ liệu!");
     }
   };
 
@@ -116,14 +118,13 @@ const AdminHome = () => {
           updatedData.sort((a, b) => (a.status === "Chưa ký" ? -1 : 1));
           return updatedData;
         });
-        message.success("Ký xác thực thành công!");
+        message.success("Ký thành công!");
       }
     } catch (error) {
-      message.error("Lỗi trong quá trình ký!");
+      message.error("Lỗi hệ thống khi ký!");
     }
   };
 
-  // --- LOGIC XỬ LÝ KIỂM TRA FILE ---
   const handleVerifyOk = async () => {
     if (!verifyId || !verifyFile) {
       message.error("Vui lòng nhập ID và chọn file PDF.");
@@ -132,7 +133,6 @@ const AdminHome = () => {
     setVerifyLoading(true);
     const formData = new FormData();
     formData.append("file", verifyFile);
-
     try {
       const response = await fetch(
         `${apiUrl}/verify_upload/${verifyId.trim()}`,
@@ -142,24 +142,19 @@ const AdminHome = () => {
         },
       );
       const resData = await response.json();
-
       if (resData.Status === "Success") {
         Modal.success({
-          title: "Kết quả kiểm định",
-          content: `Tài liệu toàn vẹn và hợp lệ! Chủ sở hữu: ${resData.cccd}`,
-          okButtonProps: { style: { backgroundColor: "rgb(78, 147, 178)" } },
+          title: "Hợp lệ",
+          content: `Chủ sở hữu: ${resData.cccd}`,
         });
       } else {
-        Modal.error({
-          title: "Phát hiện sai lệch!",
-          content: resData.Message,
-        });
+        Modal.error({ title: "Gian lận!", content: resData.Message });
       }
       setIsVerifyModalVisible(false);
       setVerifyId("");
       setVerifyFile(null);
     } catch (error) {
-      message.error("Lỗi kết nối Server.");
+      message.error("Lỗi kết nối!");
     } finally {
       setVerifyLoading(false);
     }
@@ -170,16 +165,43 @@ const AdminHome = () => {
     onClick: () => handleSign(item),
   }));
 
+  // Lấy dữ liệu cho trang hiện tại
+  const currentTableData = dataWithActions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
   return (
     <div className="container" style={{ padding: "20px" }}>
-      {/* NÚT KIỂM TRA DÀNH CHO ADMIN */}
+      {/* BẢNG DỮ LIỆU - Tắt pagination mặc định */}
+      <Table
+        columns={columns}
+        dataSource={currentTableData}
+        pagination={false}
+        rowClassName={(record) =>
+          record.status === "Đã ký" ? "signed-row" : "unsigned-row"
+        }
+      />
+
+      {/* THANH ĐIỀU KHIỂN DƯỚI CÙNG (NGANG HÀNG) */}
       <div
         style={{
-          marginBottom: "20px",
+          marginTop: "20px",
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
+        {/* Phân trang bên trái */}
+        <Pagination
+          current={currentPage}
+          total={data.length}
+          pageSize={pageSize}
+          onChange={(page) => setCurrentPage(page)}
+          showSizeChanger={false}
+        />
+
+        {/* Nút Kiểm tra tài liệu bên phải */}
         <Button
           type="default"
           icon={<SafetyCertificateOutlined />}
@@ -190,22 +212,14 @@ const AdminHome = () => {
             border: "1px solid rgb(78, 147, 178)",
             color: "rgb(78, 147, 178)",
             backgroundColor: "#fff",
+            borderRadius: "6px",
           }}
         >
-          Kiểm tra tài liệu (Integrity)
+          Kiểm tra tài liệu
         </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={dataWithActions}
-        pagination={{ pageSize: 7 }}
-        rowClassName={(record) =>
-          record.status === "Đã ký" ? "signed-row" : "unsigned-row"
-        }
-      />
-
-      {/* MODAL KIỂM TRA TÀI LIỆU */}
+      {/* MODAL GIỮ NGUYÊN NHƯ CŨ */}
       <Modal
         title={
           <Typography variant="h4" className="request-title">
@@ -213,28 +227,22 @@ const AdminHome = () => {
           </Typography>
         }
         open={isVerifyModalVisible}
-        okText="Bắt đầu kiểm tra"
+        okText="Kiểm tra ngay"
         onOk={handleVerifyOk}
         confirmLoading={verifyLoading}
         onCancel={() => setIsVerifyModalVisible(false)}
         okButtonProps={{ style: { backgroundColor: "rgb(78, 147, 178)" } }}
       >
-        <div style={{ marginBottom: 16 }}>
-          <Text strong>Nhập mã định danh (ID):</Text>
-          <Input
-            placeholder="Ví dụ: 362540"
-            value={verifyId}
-            onChange={(e) => setVerifyId(e.target.value)}
-            style={{ marginTop: 8 }}
-          />
-        </div>
-        <div style={{ marginBottom: 8 }}>
-          <Text strong>Tải lên file PDF đối soát:</Text>
-        </div>
+        <Input
+          placeholder="Nhập ID"
+          value={verifyId}
+          onChange={(e) => setVerifyId(e.target.value)}
+          style={{ marginBottom: 16 }}
+        />
         <Dragger
           multiple={false}
-          beforeUpload={(file) => {
-            setVerifyFile(file);
+          beforeUpload={(f) => {
+            setVerifyFile(f);
             return false;
           }}
           onRemove={() => setVerifyFile(null)}
@@ -242,12 +250,7 @@ const AdminHome = () => {
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
-          <p className="ant-upload-text">
-            Kéo thả file PDF vào đây để băm Hash
-          </p>
-          <p className="ant-upload-hint">
-            Hệ thống sẽ so sánh mã SHA-256 thực tế với chữ ký gốc
-          </p>
+          <p className="ant-upload-text">Kéo thả file PDF vào đây</p>
         </Dragger>
       </Modal>
     </div>
