@@ -1,0 +1,21 @@
+.verify-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+    box-sizing: border-box;
+    background-color: white;
+    color: rgb(78, 147, 178);
+}
+
+.verify-container h1 {
+    font-size: 5vh;
+    font-weight: bold;
+}
+
+.verify-container p {
+    font-size: 3vh;
+}

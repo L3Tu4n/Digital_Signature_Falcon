@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+motor
+pymongo
+python-dotenv
+email-validator
+qrcode
+PyPDF2
+reportlab
+pycryptodome
+numpy
+cryptography
+PyJWT
+argon2-cffi

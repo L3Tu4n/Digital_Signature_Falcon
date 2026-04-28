@@ -1,0 +1,118 @@
+.container {
+  margin-top: 15px;
+  max-width: 100%;
+  color: rgb(78, 147, 178);
+}
+
+.ant-table-tbody > tr > td {
+  color: rgb(78, 147, 178);
+}
+
+.ant-table-thead > tr > th {
+  border-radius: 0 !important;
+}
+
+.signed-row {
+  background-color: #efefef;
+  cursor: not-allowed;
+}
+
+.unsigned-row {
+  background-color: #ffffff;
+}
+
+.styled-button {
+  background-color: rgb(78, 147, 178);
+  border-color: rgb(78, 147, 178);
+  color: white;
+}
+
+.ant-pagination {
+  display: inline-block;
+  padding-left: 0;
+  border-radius: 4px;
+}
+
+.ant-pagination-item {
+  display: inline-block;
+  min-width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  text-align: center;
+  line-height: 32px;
+  vertical-align: middle;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.ant-pagination .ant-pagination-item {
+  color: rgb(29, 29, 29);
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+}
+
+.ant-pagination .ant-pagination-item:hover {
+  background-color: #fff !important;
+  border: 1px solid #d9d9d9 !important;
+}
+
+.ant-pagination .ant-pagination-item-active {
+  color: white;
+  border-color: rgb(109, 184, 219);
+  background-color: rgb(78, 147, 178);
+}
+
+.ant-pagination .ant-pagination-item-active:hover {
+  border-color: rgb(109, 184, 219) !important;
+  background-color: rgb(78, 147, 178) !important;
+}
+
+.ant-pagination-prev,
+.ant-pagination-next {
+  cursor: pointer;
+  background-color: white;
+}
+
+.ant-pagination-prev,
+.ant-pagination-next,
+.ant-pagination-jump-prev,
+.ant-pagination-jump-next {
+  display: inline-block;
+  min-width: 32px;
+  height: 32px;
+  text-align: center;
+  line-height: 32px;
+  vertical-align: middle;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.ant-pagination .ant-pagination-jump-next {
+  color: rgb(29, 29, 29);
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+}
+
+.ant-pagination
+  .ant-pagination-jump-next
+  .ant-pagination-item-container
+  .ant-pagination-item-link-icon {
+  color: rgb(29, 29, 29);
+}
+
+.ant-pagination .ant-pagination-jump-prev {
+  color: rgb(29, 29, 29);
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+}
+
+.ant-pagination
+  .ant-pagination-jump-prev
+  .ant-pagination-item-container
+  .ant-pagination-item-link-icon {
+  color: rgb(29, 29, 29);
+}

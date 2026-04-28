@@ -1,0 +1,43 @@
+.request-container {
+  position: relative;
+}
+
+.request-title {
+  margin-bottom: 16px;
+}
+
+.request-button-container {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+}
+
+.Request.signed-row {
+  background-color: #e6fffb;
+}
+
+.Request.styled-button {
+  background-color: #1890ff;
+  color: white;
+  border: none;
+}
+
+.Request.styled-button:disabled {
+  background-color: #d9d9d9;
+  color: #a6a6a6;
+}
+
+.pass-signed-row {
+  background-color: #ffffff;
+}
+
+.pass-unsigned-row {
+  background-color: #efefef;
+  cursor: not-allowed;
+}
+
+.request-btn {
+  background-color: rgb(78, 147, 178);
+  color: white;
+  border: none;
+}

@@ -1,0 +1,88 @@
+.signin-form {
+  max-width: 500px;
+  margin: 15px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.signin,
+.password-signin-container {
+  display: block;
+  font-weight: bold;
+  position: relative;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.input-signin-cccd,
+.input-signin-password {
+  width: 100%;
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-signin-cccd:hover,
+.input-signin-password:hover {
+  border-color: rgb(78, 147, 178);
+}
+
+.input-signin-cccd:focus,
+.input-signin-password:focus {
+  border-color: rgb(78, 147, 178);
+  outline: none;
+}
+
+.toggle-signin-password {
+  position: absolute;
+  right: 5px;
+  top: 17%;
+  background: none;
+  border: none;
+  font-size: 1em;
+  color: gray;
+}
+
+.signin-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signin-submit button {
+  width: 100%;
+  padding: 5px;
+  font-size: 20px;
+  margin-top: 15px;
+  background-color: rgb(78, 147, 178);
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.signin-submit button:hover {
+  background-color: rgb(109, 184, 219);
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.signup-link a {
+  color: rgb(78, 147, 178);
+  text-decoration: none;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}

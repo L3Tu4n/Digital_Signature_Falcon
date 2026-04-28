@@ -1,0 +1,148 @@
+.signup-form {
+  max-width: 500px;
+  margin: 15px auto 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.signup,
+.password-signup-container {
+  display: block;
+  font-weight: bold;
+  position: relative;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.input-signup-cccd,
+.input-first-and-last-name,
+.input-signup-address,
+.input-signup-password,
+.input-confirm-password,
+.form-control {
+  width: 100%;
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-signup-cccd:focus,
+.input-first-and-last-name:focus,
+.input-signup-address:focus,
+.input-signup-password:focus,
+.input-confirm-password:focus,
+.form-control:focus {
+  border-color: rgb(78, 147, 178);
+  outline: none;
+}
+
+.input-signup-cccd:hover,
+.input-first-and-last-name:hover,
+.input-signup-address:hover,
+.input-signup-password:hover,
+.input-confirm-password:hover,
+.form-control:hover {
+  border-color: rgb(78, 147, 178);
+}
+
+.gender-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.custom-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-radio-label {
+  position: relative;
+  padding-left: 3px;
+  cursor: pointer;
+}
+
+.toggle-signup-password {
+  position: absolute;
+  right: 5px;
+  top: 17%;
+  background: none;
+  border: none;
+  font-size: 1em;
+  color: gray;
+}
+
+.signup-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-submit button {
+  width: 100%;
+  padding: 5px;
+  font-size: 20px;
+  background-color: rgb(78, 147, 178);
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+}
+
+.signup-submit button:hover {
+  background-color: rgb(109, 184, 219);
+}
+
+.agreement {
+  margin-bottom: 15px;
+  font-size: 13px;
+}
+
+.agreement input {
+  margin-right: 5px;
+  accent-color: rgb(78, 147, 178);
+}
+.agreement a {
+  color: rgb(78, 147, 178);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.agreement a:hover {
+  text-decoration: underline;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.login-link a {
+  color: rgb(78, 147, 178);
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+  color: red;
+  font-weight: normal;
+  font-size: 13px;
+}

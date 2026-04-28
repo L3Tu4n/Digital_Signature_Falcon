@@ -1,0 +1,41 @@
+.home-container {
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 1000px;
+  border-radius: 10px;
+  background-color: #ecf0f1;
+  color: black;
+}
+
+.home-container h1 {
+  margin-top: 10px;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+}
+
+.announcement,
+.instructions,
+.contact {
+  margin-top: 35px;
+}
+
+.announcement h2,
+.instructions h2,
+.contact h2 {
+  color: rgb(78, 147, 178);
+  border-bottom: 2px solid rgb(78, 147, 178);
+  padding-bottom: 10px;
+}
+
+.announcement ul,
+.instructions ul,
+.contact ul {
+  padding-left: 20px;
+}
+
+.announcement li,
+.instructions li,
+.contact li {
+  margin-bottom: 10px;
+}
